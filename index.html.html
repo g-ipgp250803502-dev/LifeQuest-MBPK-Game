@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeQuest MBPK</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:'Comic Sans MS', Arial, sans-serif;
+  background:linear-gradient(135deg,#a7f3d0,#bfdbfe,#fde68a);
+  text-align:center;
+  color:#1f2937;
+  overflow-x:hidden;
+}
+
+.screen{
+  min-height:100vh;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+.active{
+  display:flex;
+}
+
+.card{
+  width:95%;
+  max-width:950px;
+  background:white;
+  border-radius:35px;
+  padding:30px;
+  box-shadow:0 15px 35px rgba(0,0,0,.25);
+  animation:pop .5s ease;
+  position:relative;
+}
+
+@keyframes pop{
+  from{
+    transform:scale(.8);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+h1{
+  color:#2563eb;
+  font-size:42px;
+}
+
+h2{
+  color:#16a34a;
+  font-size:32px;
+}
+
+p{
+  font-size:22px;
+}
+
+.creator{
+  background:#fef3c7;
+  padding:15px;
+  border-radius:18px;
+  font-weight:bold;
+  color:#92400e;
+  margin:15px 0;
+}
+
+.status{
+  background:#ecfeff;
+  padding:15px;
+  border-radius:20px;
+  font-size:22px;
+  margin-bottom:20px;
+}
+
+.emoji{
+  font-size:90px;
+  margin:15px;
+}
+
+button{
+  border:none;
+  border-radius:20px;
+  padding:16px 28px;
+  margin:10px;
+  font-size:22px;
+  cursor:pointer;
+  background:#38bdf8;
+  color:white;
+  box-shadow:0 6px #0284c7;
+  transition:.2s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+button:active{
+  transform:translateY(5px);
+  box-shadow:none;
+}
+
+.option{
+  display:block;
+  width:85%;
+  margin:15px auto;
+  background:#a78bfa;
+  box-shadow:0 6px #7c3aed;
+}
+
+.correctBtn{
+  background:#22c55e;
+  box-shadow:0 6px #15803d;
+}
+
+.wrongBtn{
+  background:#f97316;
+  box-shadow:0 6px #c2410c;
+}
+
+.feedback{
+  font-size:26px;
+  font-weight:bold;
+  min-height:45px;
+}
+
+.nav{
+  margin-top:25px;
+}
+
+.drag-item{
+  display:inline-block;
+  background:#fde68a;
+  padding:18px;
+  margin:10px;
+  border-radius:18px;
+  font-size:24px;
+  cursor:grab;
+  border:3px solid #f59e0b;
+}
+
+.drop-box{
+  border:5px dashed #22c55e;
+  border-radius:25px;
+  background:#dcfce7;
+  min-height:150px;
+  padding:25px;
+  font-size:24px;
+  margin:20px;
+}
+
+.slider{
+  width:80%;
+  height:30px;
+}
+
+.badge{
+  background:#facc15;
+  padding:20px;
+  border-radius:25px;
+  font-size:26px;
+  font-weight:bold;
+  margin:20px;
+  border:4px solid #ca8a04;
+}
+
+.progress-container{
+  width:90%;
+  height:25px;
+  background:#e5e7eb;
+  border-radius:20px;
+  margin:15px auto;
+  overflow:hidden;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#22c55e,#84cc16,#facc15);
+  transition:.4s;
+}
+
+.sound-control{
+  position:absolute;
+  top:15px;
+  right:15px;
+  background:#f43f5e;
+  box-shadow:0 5px #be123c;
+  font-size:18px;
+  padding:10px 15px;
+}
+
+.avatar{
+  font-size:80px;
+  display:inline-block;
+  margin:15px;
+  padding:20px;
+  border-radius:25px;
+  background:#e0f2fe;
+  cursor:pointer;
+  border:4px solid transparent;
+}
+
+.avatar:hover{
+  border-color:#2563eb;
+  transform:scale(1.1);
+}
+
+.selected-avatar{
+  border-color:#22c55e;
+  background:#dcfce7;
+}
+
+.memory-card{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  width:120px;
+  height:120px;
+  margin:10px;
+  border-radius:20px;
+  background:#93c5fd;
+  font-size:50px;
+  cursor:pointer;
+  box-shadow:0 6px #2563eb;
+}
+
+.hidden-card{
+  background:#60a5fa;
+  color:transparent;
+}
+
+.catch-area{
+  position:relative;
+  height:350px;
+  background:#dbeafe;
+  border-radius:25px;
+  overflow:hidden;
+  border:5px solid #60a5fa;
+}
+
+.star{
+  position:absolute;
+  font-size:45px;
+  cursor:pointer;
+  animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+  from{
+    top:-60px;
+  }
+  to{
+    top:360px;
+  }
+}
+
+.small{
+  font-size:18px;
+  color:#4b5563;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" loop>
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73d5a.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="clickSound">
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_5c6ccdf3c8.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="correctSound">
+  <source src="https://cdn.pixabay.com/audio/2022/03/10/audio_2b4c3b6f4d.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="wrongSound">
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_4fefb0c05a.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="winSound">
+  <source src="https://cdn.pixabay.com/audio/2021/08/04/audio_12b0c7443c.mp3" type="audio/mpeg">
+</audio>
+
+<section class="screen active" id="slide1">
+  <div class="card">
+    <button class="sound-control" onclick="toggleMusic()">🔊</button>
+
+    <h1>🌟 LifeQuest MBPK 🌟</h1>
+    <h2>Misi Kehidupan Pintar</h2>
+
+    <div class="emoji">🧠🎮🌈</div>
+
+    <p class="creator">
+      Dicipta Oleh:<br>
+      MUHAMMAD SYARQAWI BIN NORDIN<br>
+      PPISMP 25/26 PK4
+    </p>
+
+    <p>Gamifikasi digital interaktif untuk murid MBPK Masalah Pembelajaran.</p>
+
+    <button onclick="goTo('slide2')">Mula Permainan 🚀</button>
+  </div>
+</section>
+
+<section class="screen" id="slide2">
+  <div class="card">
+    <h2>📜 Arahan Permainan</h2>
+    <div class="emoji">🎯</div>
+
+    <p>1. Baca atau dengar arahan setiap misi.</p>
+    <p>2. Pilih jawapan yang betul.</p>
+    <p>3. Kumpul bintang dan jaga nyawa.</p>
+    <p>4. Selesaikan semua misi untuk mendapat sijil.</p>
+
+    <button onclick="goTo('avatarScreen')">Seterusnya ➡️</button>
+  </div>
+</section>
+
+<section class="screen" id="avatarScreen">
+  <div class="card">
+    <h2>👤 Pilih Avatar Anda</h2>
+    <p>Pilih watak untuk memulakan pengembaraan.</p>
+
+    <div class="avatar" onclick="chooseAvatar('👦', this)">👦</div>
+    <div class="avatar" onclick="chooseAvatar('👧', this)">👧</div>
+    <div class="avatar" onclick="chooseAvatar('🧑', this)">🧑</div>
+
+    <br>
+
+    <button onclick="startGame()">Mula Misi 🚀</button>
+  </div>
+</section>
+
+<section class="screen" id="game">
+  <div class="card">
+    <button class="sound-control" onclick="toggleMusic()">🔊</button>
+
+    <h1>LifeQuest MBPK</h1>
+
+    <div class="status">
+      <span id="avatarDisplay">👦</span>
+      ⭐ Markah: <span id="score">0</span> |
+      ❤️ Nyawa: <span id="lives">3</span> |
+      🎮 Misi: <span id="missionNo">1</span>/7
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div id="gameContent"></div>
+
+    <p class="feedback" id="feedback"></p>
+  </div>
+</section>
+
+<script>
+let score = 0;
+let lives = 3;
+let mission = 1;
+let bagItems = [];
+let selectedAvatar = "👦";
+let musicOn = false;
+
+function playSound(id){
+  const sound = document.getElementById(id);
+  if(sound){
+    sound.currentTime = 0;
+    sound.play().catch(function(){});
+  }
+}
+
+function toggleMusic(){
+  const bg = document.getElementById("bgMusic");
+  bg.volume = 0.25;
+
+  if(musicOn){
+    bg.pause();
+    musicOn = false;
+  }else{
+    bg.play().catch(function(){});
+    musicOn = true;
+  }
+}
+
+function speak(text){
+  window.speechSynthesis.cancel();
+  const voice = new SpeechSynthesisUtterance(text);
+  voice.lang = "ms-MY";
+  voice.rate = 0.85;
+  voice.pitch = 1.1;
+  window.speechSynthesis.speak(voice);
+}
+
+function goTo(id){
+  playSound("clickSound");
+  document.querySelectorAll(".screen").forEach(function(s){
+    s.classList.remove("active");
+  });
+  document.getElementById(id).classList.add("active");
+
+  if(id === "slide2"){
+    speak("Selamat datang ke LifeQuest. Baca arahan permainan dengan teliti.");
+  }
+
+  if(id === "avatarScreen"){
+    speak("Pilih avatar anda untuk memulakan pengembaraan.");
+  }
+}
+
+function chooseAvatar(avatar, element){
+  playSound("clickSound");
+  selectedAvatar = avatar;
+
+  document.querySelectorAll(".avatar").forEach(function(a){
+    a.classList.remove("selected-avatar");
+  });
+
+  element.classList.add("selected-avatar");
+}
+
+function updateStatus(){
+  document.getElementById("score").innerText = score;
+  document.getElementById("lives").innerText = lives;
+  document.getElementById("missionNo").innerText = mission;
+  document.getElementById("avatarDisplay").innerText = selectedAvatar;
+
+  const progress = (mission / 7) * 100;
+  document.getElementById("progressBar").style.width = progress + "%";
+}
+
+function startGame(){
+  playSound("clickSound");
+
+  const bg = document.getElementById("bgMusic");
+  bg.volume = 0.25;
+  bg.play().catch(function(){});
+  musicOn = true;
+
+  score = 0;
+  lives = 3;
+  mission = 1;
+
+  updateStatus();
+  goTo("game");
+  mission1();
+}
+
+function correct(text){
+  playSound("correctSound");
+  score += 20;
+  updateStatus();
+
+  feedback.innerHTML = "✅ " + text;
+  feedback.style.color = "green";
+
+  speak(text);
+}
+
+function wrong(text){
+  playSound("wrongSound");
+  lives--;
+  updateStatus();
+
+  feedback.innerHTML = "❌ " + text;
+  feedback.style.color = "red";
+
+  speak(text);
+
+  if(lives <= 0){
+    setTimeout(gameOver, 900);
+  }
+}
+
+function nextButton(next){
+  gameContent.innerHTML += `
+    <div class="nav">
+      <button onclick="${next}()">Misi Seterusnya ➡️</button>
+    </div>
+  `;
+}
+
+function disableOptions(){
+  document.querySelectorAll(".option").forEach(function(btn){
+    btn.disabled = true;
+  });
+}
+/* MISI 1: QUIZ */
+function mission1(){
+  mission = 1;
+  updateStatus();
+  feedback.innerHTML = "";
+
+  speak("Misi pertama. Pilih aktiviti yang betul selepas bangun tidur.");
+
+  gameContent.innerHTML = `
+    <h2>🪥 Misi 1: Rutin Pagi</h2>
+    <div class="emoji">☀️🛏️🪥</div>
+    <p>Apakah perkara yang sesuai dilakukan selepas bangun tidur?</p>
+
+    <button class="option wrongBtn" onclick="wrong('Main telefon bukan rutin pagi yang baik.'); disableOptions()">Main telefon 📱</button>
+    <button class="option correctBtn" onclick="correct('Bagus! Gosok gigi menjaga kebersihan diri.'); disableOptions(); nextButton('mission2')">Gosok gigi 🪥</button>
+    <button class="option wrongBtn" onclick="wrong('Tidur semula bukan pilihan terbaik.'); disableOptions()">Tidur semula 😴</button>
+  `;
+}
+
+/* MISI 2: DRAG DROP */
+function mission2(){
+  mission = 2;
+  bagItems = [];
+  updateStatus();
+  feedback.innerHTML = "";
+
+  speak("Misi kedua. Seret barang yang sesuai ke dalam beg sekolah.");
+
+  gameContent.innerHTML = `
+    <h2>🎒 Misi 2: Susun Beg Sekolah</h2>
+    <p>Seret barang yang sesuai ke dalam beg sekolah.</p>
+
+    <div class="drag-item" draggable="true" ondragstart="drag(event)" id="buku">📘 Buku</div>
+    <div class="drag-item" draggable="true" ondragstart="drag(event)" id="pensel">✏️ Pensel</div>
+    <div class="drag-item" draggable="true" ondragstart="drag(event)" id="mainan">🧸 Mainan</div>
+    <div class="drag-item" draggable="true" ondragstart="drag(event)" id="botol">💧 Botol Air</div>
+
+    <div class="drop-box" id="dropBox" ondrop="drop(event)" ondragover="allowDrop(event)">
+      🎒 Beg Sekolah
+    </div>
+
+    <button onclick="checkBag()">Semak Jawapan ✅</button>
+  `;
+}
+
+function allowDrop(e){
+  e.preventDefault();
+}
+
+function drag(e){
+  e.dataTransfer.setData("text", e.target.id);
+}
+
+function drop(e){
+  e.preventDefault();
+
+  let item = e.dataTransfer.getData("text");
+
+  if(!bagItems.includes(item)){
+    bagItems.push(item);
+    document.getElementById("dropBox").innerHTML += "<br>" + document.getElementById(item).innerHTML;
+    playSound("clickSound");
+  }
+}
+
+function checkBag(){
+  if(
+    bagItems.includes("buku") &&
+    bagItems.includes("pensel") &&
+    bagItems.includes("botol") &&
+    !bagItems.includes("mainan")
+  ){
+    correct("Hebat! Beg sekolah lengkap.");
+    nextButton("mission3");
+  }else{
+    wrong("Ada barang yang salah atau tidak lengkap. Cuba sekali lagi.");
+    setTimeout(mission2,1200);
+  }
+}
+
+/* MISI 3: SLIDER */
+function mission3(){
+  mission = 3;
+  updateStatus();
+  feedback.innerHTML = "";
+
+  speak("Misi ketiga. Geser slider ke kanan untuk melihat kiri dan kanan sebelum melintas jalan.");
+
+  gameContent.innerHTML = `
+    <h2>🚦 Misi 3: Melintas Jalan</h2>
+    <div class="emoji">🚶‍♂️🚗🚦</div>
+    <p>Geser slider hingga ke kanan untuk lihat kiri dan kanan sebelum melintas.</p>
+
+    <input type="range" min="0" max="100" value="0" class="slider" id="roadSlider">
+    <br><br>
+
+    <button onclick="checkRoad()">Melintas Sekarang 🚶‍♂️</button>
+  `;
+}
+
+function checkRoad(){
+  let value = document.getElementById("roadSlider").value;
+
+  if(value >= 85){
+    correct("Selamat! Anda melihat kiri dan kanan dahulu.");
+    nextButton("mission4");
+  }else{
+    wrong("Belum selamat. Geser hingga hujung dahulu.");
+  }
+}
+
+/* MISI 4: PILIH MAKANAN */
+function mission4(){
+  mission = 4;
+  updateStatus();
+  feedback.innerHTML = "";
+
+  speak("Misi keempat. Pilih makanan yang paling sihat.");
+
+  gameContent.innerHTML = `
+    <h2>🍎 Misi 4: Pilih Makanan Sihat</h2>
+    <div class="emoji">🍎🍬🥤</div>
+    <p>Makanan manakah paling sihat?</p>
+
+    <button class="option correctBtn" onclick="correct('Betul! Buah baik untuk kesihatan.'); disableOptions(); nextButton('mission5')">Buah-buahan 🍎</button>
+    <button class="option wrongBtn" onclick="wrong('Gula-gula tidak sesuai dimakan terlalu banyak.'); disableOptions()">Gula-gula 🍬</button>
+    <button class="option wrongBtn" onclick="wrong('Air gas kurang sihat jika selalu diminum.'); disableOptions()">Air gas 🥤</button>
+  `;
+}
+
+/* MISI 5: MEMORY GAME */
+let memoryFirst = null;
+let memorySecond = null;
+let memoryLock = false;
+let matchedPairs = 0;
+
+function mission5(){
+  mission = 5;
+  updateStatus();
+  feedback.innerHTML = "";
+
+  speak("Misi kelima. Padankan kad yang sama.");
+
+  memoryFirst = null;
+  memorySecond = null;
+  memoryLock = false;
+  matchedPairs = 0;
+
+  let cards = ["🧼","🧼","🍎","🍎","📘","📘"];
+  cards.sort(() => Math.random() - 0.5);
+
+  let html = `
+    <h2>🧠 Misi 5: Padankan Kad</h2>
+    <p>Klik dua kad yang sama.</p>
+  `;
+
+  cards.forEach((icon, index) => {
+    html += `
+      <div class="memory-card hidden-card" data-icon="${icon}" onclick="flipCard(this)">
+        ${icon}
+      </div>
+    `;
+  });
+
+  gameContent.innerHTML = html;
+}
+
+function flipCard(card){
+  if(memoryLock || card.classList.contains("matched") || card === memoryFirst){
+    return;
+  }
+
+  playSound("clickSound");
+  card.classList.remove("hidden-card");
+
+  if(!memoryFirst){
+    memoryFirst = card;
+    return;
+  }
+
+  memorySecond = card;
+  memoryLock = true;
+
+  if(memoryFirst.dataset.icon === memorySecond.dataset.icon){
+    memoryFirst.classList.add("matched");
+    memorySecond.classList.add("matched");
+
+    matchedPairs++;
+    score += 10;
+    updateStatus();
+    playSound("correctSound");
+
+    memoryFirst = null;
+    memorySecond = null;
+    memoryLock = false;
+
+    if(matchedPairs === 3){
+      correct("Tahniah! Semua kad berjaya dipadankan.");
+      nextButton("mission6");
+    }
+  }else{
+    playSound("wrongSound");
+
+    setTimeout(() => {
+      memoryFirst.classList.add("hidden-card");
+      memorySecond.classList.add("hidden-card");
+
+      memoryFirst = null;
+      memorySecond = null;
+      memoryLock = false;
+    }, 900);
+  }
+}
+
+/* MISI 6: CATCH GAME */
+let catchCount = 0;
+let catchTimer = null;
+
+function mission6(){
+  mission = 6;
+  catchCount = 0;
+  updateStatus();
+  feedback.innerHTML = "";
+
+  speak("Misi keenam. Tangkap lima bintang yang jatuh.");
+
+  gameContent.innerHTML = `
+    <h2>⭐ Misi 6: Tangkap Bintang</h2>
+    <p>Klik 5 bintang yang jatuh untuk menang.</p>
+
+    <div class="catch-area" id="catchArea"></div>
+
+    <p>Bintang ditangkap: <span id="catchCount">0</span>/5</p>
+  `;
+
+  catchTimer = setInterval(createStar, 700);
+}
+
+function createStar(){
+  const area = document.getElementById("catchArea");
+
+  if(!area){
+    clearInterval(catchTimer);
+    return;
+  }
+
+  const star = document.createElement("div");
+  star.className = "star";
+  star.innerHTML = "⭐";
+  star.style.left = Math.random() * 85 + "%";
+
+  star.onclick = function(){
+    playSound("correctSound");
+    catchCount++;
+    score += 5;
+    updateStatus();
+    document.getElementById("catchCount").innerText = catchCount;
+    star.remove();
+
+    if(catchCount >= 5){
+      clearInterval(catchTimer);
+      correct("Hebat! Anda berjaya menangkap semua bintang.");
+      nextButton("mission7");
+    }
+  };
+
+  area.appendChild(star);
+
+  setTimeout(() => {
+    if(star.parentElement){
+      star.remove();
+    }
+  }, 3000);
+}
+
+/* MISI 7: FINAL QUIZ */
+function mission7(){
+  mission = 7;
+  updateStatus();
+  feedback.innerHTML = "";
+
+  speak("Misi terakhir. Apakah yang perlu dibuat selepas menggunakan tandas?");
+
+  gameContent.innerHTML = `
+    <h2>🧼 Misi 7: Kebersihan Diri</h2>
+    <div class="emoji">🚽🧼👏</div>
+    <p>Apakah perlu dibuat selepas menggunakan tandas?</p>
+
+    <button class="option correctBtn" onclick="correct('Tahniah! Anda menjaga kebersihan diri.'); disableOptions(); setTimeout(finishGame,1200)">Basuh tangan 🧼</button>
+    <button class="option wrongBtn" onclick="wrong('Tangan perlu dibasuh dahulu sebelum makan.'); disableOptions()">Terus makan 🍽️</button>
+    <button class="option wrongBtn" onclick="wrong('Bermain air bukan amalan yang baik.'); disableOptions()">Bermain air 💧</button>
+  `;
+}
+
+function finishGame(){
+  playSound("winSound");
+  speechSynthesis.cancel();
+
+  feedback.innerHTML = "";
+
+  let result = score >= 100 ? "🏆 Cemerlang!" : "🌟 Bagus Mencuba!";
+
+  gameContent.innerHTML = `
+    <h2>${result}</h2>
+    <div class="emoji">🎉🏅🎊</div>
+
+    <p>Markah akhir anda ialah:</p>
+    <h1>${score}</h1>
+
+    <div class="badge">
+      SIJIL DIGITAL<br>
+      LifeQuest MBPK
+    </div>
+
+    <p class="creator">
+      Dicipta Oleh:<br>
+      MUHAMMAD SYARQAWI BIN NORDIN<br>
+      PPISMP 25/26 PK4
+    </p>
+
+    <button onclick="startGame()">Main Semula 🔁</button>
+    <button onclick="goTo('slide1')">Kembali ke Menu 🏠</button>
+  `;
+
+  speak("Tahniah. Anda telah berjaya menamatkan semua misi LifeQuest.");
+}
+
+function gameOver(){
+  playSound("wrongSound");
+  speechSynthesis.cancel();
+
+  feedback.innerHTML = "";
+
+  gameContent.innerHTML = `
+    <h2>❤️ Nyawa Habis</h2>
+    <div class="emoji">😢</div>
+
+    <p>Jangan risau. Cuba lagi untuk menjadi Daily Hero!</p>
+
+    <button onclick="startGame()">Cuba Lagi 🔁</button>
+    <button onclick="goTo('slide1')">Kembali ke Menu 🏠</button>
+  `;
+
+  speak("Nyawa telah habis. Cuba lagi.");
+}
+</script>
+
+</body>
+</html>
